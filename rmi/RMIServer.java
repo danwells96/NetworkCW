@@ -30,6 +30,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 
 	private int totalMessages = -1;
 	private int[] receivedMessages;
+	private int msgRecv = 0;
 
 	public RMIServer() throws RemoteException {
 		super();
@@ -37,29 +38,36 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 
 	public void receiveMessage(MessageInfo msg) throws RemoteException {
 		// TO-DO: On receipt of first message, initialise the receive buffer
-		totalMessages = msg.totalMessages;
 
 		if (totalMessages == -1) {
+			totalMessages = msg.totalMessages;
+			msgRecv = 0;
 			receivedMessages = new int[totalMessages];
 			for (int i=0; i<totalMessages; i++) {
 				receivedMessages[i] = 0;
 			}
 		}
-		
+
 		// TO-DO: Log receipt of the message
 		receivedMessages[msg.messageNum-1] = 1;
+		msgRecv++;
 		System.out.println("Message " + msg.messageNum + " was received");
-		
+
 
 		// TO-DO: If this is the last expected message, then identify
 		//        any missing messages
 		if(msg.messageNum == totalMessages) {
-			System.out.print("The following messages are missed: ");
-	
-			for(int i = 0; i < totalMessages; i++) {
-				if(receivedMessages[i] == 0) {
-					System.out.print(i + ", ");
+			if (msgRecv == totalMessages)
+				System.out.println("All messages received successfully");
+			else {
+				System.out.print("The following messages are missed: ");
+
+				for(int i = 0; i < totalMessages; i++) {
+					if(receivedMessages[i] == 0) {
+						System.out.print(i + ", ");
+					}
 				}
+
 			}
 			totalMessages = -1;
 		}
@@ -80,13 +88,13 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 		{
 			e.printStackTrace();
 		}
-		
+
 		try {
 			//Initialise RMIServer and set the RMISecurityManager
 			System.setSecurityManager(new RMISecurityManager());
 			rmis = new RMIServer();
 			//Rebind the RMI Server
-			String url = new String("RMIServer");
+			String url = new String("sy15Server");
 			rebindServer(url, rmis);
 		}
 		catch (RemoteException e)
@@ -113,7 +121,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 		catch (Exception e) {
 			System.out.println("Error in " + e.getMessage());
 		}
-		
+
 		// Start / find the registry (hint use LocateRegistry.createRegistry(...)
 		// If we *know* the registry is running we could skip this (eg run rmiregistry in the start script)
 

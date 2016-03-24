@@ -42,12 +42,12 @@ public class RMIClient {
 			System.setSecurityManager(new RMISecurityManager());
 		// TO-DO: Bind to RMIServer
 		try {
-			String name = "RMIServer";
+			String name = "sy15Server";
 			Registry registry = LocateRegistry.getRegistry(args[0],1099);
 			iRMIServer = (RMIServerI) registry.lookup(name);
 
 		// TO-DO: Attempt to send messages the specified number of times
-			for (int i=0; i<=numMessages; i++) {
+			for (int i=1; i<=numMessages; i++) {
 				MessageInfo msg = new MessageInfo(numMessages, i);
 				iRMIServer.receiveMessage(msg);
 			}
