@@ -4,9 +4,16 @@
  */
 package rmi;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.RMISecurityManager; // deprecated? use SecurityManger instead?
 
 import common.MessageInfo;
 
@@ -26,27 +33,30 @@ public class RMIClient {
 			System.exit(-1);
 		}
 
-		String urlServer = new String("rmi://" + args[0] + "/RMIServer");
 		int numMessages = Integer.parseInt(args[1]);
 
 		// TO-DO: Initialise Security Manager
+	
+		if (System.getSecurityManager()==null)
+			System.setSecurityManager(new RMISecurityManager());
+		// TO-DO: Bind to RMIServer
 		try {
-			if (System.getSecurityManager()==null)
-				System.setSecurityManager(new RMISecurityManager());
+			String serverURL = new String("rmi://" + args[0] + "/RMIServer");
+            Registry registry = LocateRegistry.getRegistry(args[0],1099);
+			iRMIServer = (RMIServerI) Naming.lookup(serverURL);
 
-			myRMIServer = (RMIServerI) Naming.lookup(urlServer);
-
+		// TO-DO: Attempt to send messages the specified number of times
 			for (int i=0; i<=numMessages; i++) {
 				MessageInfo msg = new MessageInfo(numMessages, i);
-				myRMIServer.receiveMessage(msg);
+				iRMIServer.receiveMessage(msg);
 			}
 		}
 		catch (Exception e) {
 			System.out.println(e);
 		}
-		// TO-DO: Bind to RMIServer
+		
 
-		// TO-DO: Attempt to send messages the specified number of times
+
 
 	}
 }
