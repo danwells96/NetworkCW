@@ -4,21 +4,25 @@
  */
 package rmi;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.RMISecurityManager; // deprecated? use SecurityManger instead?
 
 import common.MessageInfo;
-
-import java.io.IOException;
-import java.util.logging.*;
-import java.net.MalformedURLException;
 
 /**
  * @author bandara
  *
  */
 public class RMIClient {
+
 	public static void main(String[] args) {
 
 		RMIServerI iRMIServer = null;
@@ -33,29 +37,27 @@ public class RMIClient {
 		int numMessages = Integer.parseInt(args[1]);
 
 		// TO-DO: Initialise Security Manager
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
-
+	
+		if (System.getSecurityManager()==null)
+			System.setSecurityManager(new RMISecurityManager());
 		// TO-DO: Bind to RMIServer
-        try {
-            iRMIServer = (RMIServerI) Naming.lookup(urlServer);
-        } catch
-        (NotBoundException|MalformedURLException|RemoteException e) {
-            System.out.println("Exception:" + e.getMessage());
-            System.exit(-1);
-        }
+		try {
+			String name = "RMIServerI";
+			Registry registry = LocateRegistry.getRegistry(args[0],2000);
+			iRMIServer = (RMIServerI) registry.lookup(name);
 
 		// TO-DO: Attempt to send messages the specified number of times
-        for (int i = 0; i < numMessages; i++) {
-            MessageInfo msg = new MessageInfo(numMessages, i);
-            try {
-                iRMIServer.receiveMessage(msg);
-            } catch (RemoteException e) {
-                System.out.println("Exception:" + e.getMessage() +
-                        " -- message " + Integer.toString(i) +
-                        " unsent");
-            }
-        }
-    }
+			for (int i=0; i<=numMessages; i++) {
+				MessageInfo msg = new MessageInfo(numMessages, i);
+				iRMIServer.receiveMessage(msg);
+			}
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		
+
+
+
+	}
 }
