@@ -42,8 +42,8 @@ public class RMIClient {
 			System.setSecurityManager(new RMISecurityManager());
 		// TO-DO: Bind to RMIServer
 		try {
-			String name = "RMIServerI";
-			Registry registry = LocateRegistry.getRegistry(args[0],2000);
+			String name = "RMIServer";
+			Registry registry = LocateRegistry.getRegistry(args[0],1099);
 			iRMIServer = (RMIServerI) registry.lookup(name);
 
 		// TO-DO: Attempt to send messages the specified number of times
