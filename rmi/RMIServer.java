@@ -68,6 +68,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 
 	public static void main(String[] args) {
 
+		RMIServer rmis = null;
 		try {
 			//Get IP address and print it to the screen
 			InetAddress addr = InetAddress.getLocalHost();
@@ -82,11 +83,11 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 		
 		try {
 			//Initialise RMIServer and set the RMISecurityManager
-			RMIServer rmis = null;
 			System.setSecurityManager(new RMISecurityManager());
 			rmis = new RMIServer();
 			//Rebind the RMI Server
-			rebindServer("RMIServer", rmis);
+			String url = new String("RMIServerI");
+			rebindServer(url, rmis);
 		}
 		catch (RemoteException e)
 		{
@@ -101,13 +102,14 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 			Registry registry;
 			try {
 				// locate registry and create port at 1099
-				registry = LocateRegistry.createRegistry(1099);
+				registry = LocateRegistry.createRegistry(2000);
 			}
 			catch (RemoteException e) {
 				registry = LocateRegistry.getRegistry();
 			}
 			// bind
 			registry.rebind(serverURL, server);
+			System.out.println(registry.list());
 		}
 		catch (Exception e) {
 			System.out.println("Error in " + e.getMessage());

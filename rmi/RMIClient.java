@@ -33,6 +33,7 @@ public class RMIClient {
 			System.exit(-1);
 		}
 
+		String urlServer = new String("rmi://" + args[0] + "/RMIServer");
 		int numMessages = Integer.parseInt(args[1]);
 
 		// TO-DO: Initialise Security Manager
@@ -41,9 +42,9 @@ public class RMIClient {
 			System.setSecurityManager(new RMISecurityManager());
 		// TO-DO: Bind to RMIServer
 		try {
-			String serverURL = new String("rmi://" + args[0] + "/RMIServer");
-            Registry registry = LocateRegistry.getRegistry(args[0],1099);
-			iRMIServer = (RMIServerI) Naming.lookup(serverURL);
+			String name = "RMIServerI";
+			Registry registry = LocateRegistry.getRegistry(args[0],2000);
+			iRMIServer = (RMIServerI) registry.lookup(name);
 
 		// TO-DO: Attempt to send messages the specified number of times
 			for (int i=0; i<=numMessages; i++) {
